@@ -2,22 +2,31 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 public class GamePanel extends JPanel implements KeyListener, MouseMotionListener {
     private int x = 400, y = 300;
     private int speed = 4;
     private boolean up, down, left, right;
     private Point mouse = new Point(0, 0);
+    private BufferedImage playerImage;
 
     public GamePanel() {
         setFocusable(true);
         addKeyListener(this);
         addMouseMotionListener(this);
+        try {
+            playerImage = ImageIO.read(new java.io.File("player.png"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        Timer timer = new Timer(16, e -> {
-            update();
-            repaint();
-        });
+        Timer timer = new Timer(16, e -> 
+                {
+                    update();
+                    repaint();
+                });
         timer.start();
     }
 
@@ -31,43 +40,47 @@ public class GamePanel extends JPanel implements KeyListener, MouseMotionListene
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D player = (Graphics2D) g;
+        Graphics2D g2 = (Graphics2D) g;
 
         // Calculate angle to mouse
         double angle = Math.atan2(mouse.y - y, mouse.x - x);
 
-        // Draw rotated triangle as placeholder
-        AffineTransform old = player.getTransform();
-        player.translate(x, y);
-        player.rotate(angle);
-        player.setColor(Color.BLUE);
-        int[] px = { -10, -10, 20 };
-        int[] py = { -10, 10, 0 };
-        player.fillPolygon(px, py, 3);
-        player.setTransform(old);
+        // Draw rotated image
+        AffineTransform old = g2.getTransform();
+        g2.translate(x, y);
+        g2.rotate(angle);
+        g2.translate(-playerImage.getWidth() / 2, -playerImage.getHeight() / 2);
+        g2.drawImage(playerImage, 0, 0, null);
+        g2.setTransform(old);
     }
 
     // Controls
     public void keyPressed(KeyEvent e) {
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_W -> up = true;
-            case KeyEvent.VK_S -> down = true;
-            case KeyEvent.VK_A -> left = true;
-            case KeyEvent.VK_D -> right = true;
-        }
+        int code = e.getKeyCode();
+        if (code == KeyEvent.VK_W) up = true;
+        if (code == KeyEvent.VK_S) down = true;
+        if (code == KeyEvent.VK_A) left = true;
+        if (code == KeyEvent.VK_D) right = true;
     }
 
     public void keyReleased(KeyEvent e) {
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_W -> up = false;
-            case KeyEvent.VK_S -> down = false;
-            case KeyEvent.VK_A -> left = false;
-            case KeyEvent.VK_D -> right = false;
-        }
+        int code = e.getKeyCode();
+        if (code == KeyEvent.VK_W) up = false;
+        if (code == KeyEvent.VK_S) down = false;
+        if (code == KeyEvent.VK_A) left = false;
+        if (code == KeyEvent.VK_D) right = false;
     }
 
-    public void keyTyped(KeyEvent e) {}
-    public void mouseMoved(MouseEvent e) { mouse = e.getPoint(); }
-    public void mouseDragged(MouseEvent e) { mouseMoved(e); }
-}
+    
+    public void keyTyped(KeyEvent e) {} // exit method
 
+    public void mouseMoved(MouseEvent e) 
+    { 
+        mouse = e.getPoint(); 
+    }
+
+    public void mouseDragged(MouseEvent e) {
+        mouseMoved(e);
+    }
+    
+}
