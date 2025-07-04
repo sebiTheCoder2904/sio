@@ -40,14 +40,13 @@ public class GamePanel extends JPanel implements KeyListener, MouseMotionListene
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
+        Graphics2D g2 = (Graphics2D) g; // Spieler initialisieren und deklarieren
 
-        // Calculate angle to mouse
-        double angle = Math.atan2(mouse.y - y, mouse.x - x);
-
-        // Draw rotated image
+        
+        double angle = Math.atan2(mouse.y - y, mouse.x - x);  //winkel zur maus berechnen
+        
         AffineTransform old = g2.getTransform();
-        g2.translate(x, y);
+        g2.translate(x, y); 
         g2.rotate(angle);
         g2.translate(-playerImage.getWidth() / 2, -playerImage.getHeight() / 2);
         g2.drawImage(playerImage, 0, 0, null);
